@@ -18,6 +18,11 @@ virtualenv venv
 pip install -r requirements.pip
 ```
 
-3. TODO
+3. Run tests.
 
+```
+pytest
+```
+
+4. TODO
 
