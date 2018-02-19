@@ -63,9 +63,11 @@ class Card:
             self.owner.balance += available_reward
             opponent.balance -= available_reward
 
-    @staticmethod
-    def get_name():
-        raise NotImplementedError()
+    def is_winning(self):
+        return False
+
+    def enables_double_roll(self):
+        return False
 
     def get_opponent(self):
         if self.game.active_player == self.owner:
@@ -129,11 +131,17 @@ class Landmark(Card):
     def __init__(self, player, game, cost):
         super().__init__(CardColor.ORANGE, CardSymbol.TOWER, player, game, [], cost, None)
 
+    def is_winning(self):
+        return True
+
 
 class TrainStation(Landmark):
 
     def __init__(self, player, game):
         super().__init__(player, game, 4)
+
+    def enables_double_roll(self):
+        return True
 
 
 class ShoppingMall(Landmark):
