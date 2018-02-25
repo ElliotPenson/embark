@@ -8,7 +8,6 @@ from collections import Counter
 from random import randint
 
 from embark import cards
-from embark.evolution import select_card
 
 ALL_CARDS = [cards.TrainStation, cards.ShoppingMall, cards.AmusementPark, cards.RadioTower,
              cards.WheatField, cards.Ranch, cards.Bakery, cards.Cafe, cards.ConvenienceStore,
@@ -45,10 +44,10 @@ class Game:
         self.inactive_player = player2
         self.winner = None
         self.establishments = Counter(STARTING_ESTABLISHMENTS)
-        self.landmarks = {player1: list(LANDMARKS), player2: list(LANDMARKS)}
+        self.landmarks = {player1: set(LANDMARKS), player2: set(LANDMARKS)}
 
     def find_available_cards(self, player):
-        return set(self.establishments.elements()) & self.landmarks[player]
+        return set(self.establishments.elements()) | self.landmarks[player]
 
     def purchase_card(self, card_class, player):
         """A factory method that creates cards and lowers the inventory count."""
@@ -64,7 +63,7 @@ class Game:
             player.receive_card(instance)
 
     def switch_player(self):
-        self.active_player, self.inactive_player = self.active_player, self.inactive_player
+        self.active_player, self.inactive_player = self.inactive_player, self.active_player
 
     def simulate_round(self):
         """Perform roll, earn, and construct stages of a round."""
@@ -89,11 +88,8 @@ class Game:
 
 class Player:
 
-    def __init__(self, genes):
-        """Create an AI that plays Machi Koro by referencing a gene dictionary (card ->
-        probability of purchase).
-        """
-        self.genes = genes
+    def __init__(self):
+        self.wins = 0
 
     def join_game(self, game):
         self.game = game
@@ -109,7 +105,7 @@ class Player:
     def has_funds_for(self, card):
         return card.cost <= self.balance
 
-    def recieve_card(self, card):
+    def receive_card(self, card):
         self.hand.append(card)
         self.balance -= card.cost
 
@@ -125,14 +121,8 @@ class Player:
             card.notify(roll_number)
 
     def construct(self, available):
-        """Sample from this player's genes to select and purchase a card."""
-        relevant_genes = {card: probability for card, probability in self.genes.items()
-                          if card in available}
-        card = select_card(relevant_genes)
-        instance = self.game.purchase_card(card, self)
-        if instance:
-            self.hand.append(instance)
-            self.balance -= instance.cost
+        """Abstract method. Return a card class from the given list."""
+        raise NotImplementedError()
 
 
 def roll(number_of_die_faces=6):

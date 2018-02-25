@@ -7,6 +7,23 @@ machi_koro.py
 import random
 
 from embark import cards
+from embark.machi_koro import Player
+
+
+class Organism(Player):
+
+    def __init__(self, chromosome):
+        """Create an AI that plays Machi Koro by referencing a gene dictionary (card
+        class -> probability of purchase).
+        """
+        self.chromosome = chromosome
+
+    def construct(self, available):
+        """Sample from this player's genes to select and purchase a card."""
+        relevant_genes = {card_class: probability
+                          for card_class, probability in self.chromosome.items()
+                          if card_class in available}
+        return select_card(relevant_genes)
 
 
 def make_random_genes():
