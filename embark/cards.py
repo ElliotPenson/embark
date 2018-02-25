@@ -63,7 +63,7 @@ class Card:
             self.owner.balance += available_reward
             opponent.balance -= available_reward
 
-    def is_winning(self):
+    def is_landmark(self):
         return False
 
     def enables_double_roll(self):
@@ -114,7 +114,7 @@ class TraderCard(Card):
 
     def activate(self):
         # choose least favorite card from inventory
-        # choose favorite card from opponent
+        # choose favorite card from opponent's inventory
         pass
 
     def purchase(self, purchaser):
@@ -131,7 +131,7 @@ class Landmark(Card):
     def __init__(self, player, game, cost):
         super().__init__(CardColor.ORANGE, CardSymbol.TOWER, player, game, [], cost, None)
 
-    def is_winning(self):
+    def is_landmark(self):
         return True
 
 
@@ -204,7 +204,7 @@ class TVStation(Card):
         super().__init__(CardColor.PURPLE, CardSymbol.TOWER, player, game, [6], 7, 5)
 
 
-class BusinessCenter(MultiplierCard):
+class BusinessCenter(TraderCard):
 
     def __init__(self, player, game):
         super().__init__(CardColor.PURPLE, CardSymbol.TOWER, player, game, [6], 8)

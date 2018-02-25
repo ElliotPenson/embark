@@ -10,11 +10,12 @@ from random import randint
 from embark import cards
 from embark.evolution import select_card
 
-STARTING_INVENTORY = {
-    cards.TrainStation: 2,
-    cards.ShoppingMall: 2,
-    cards.AmusementPark: 2,
-    cards.RadioTower: 2,
+ALL_CARDS = [cards.TrainStation, cards.ShoppingMall, cards.AmusementPark, cards.RadioTower,
+             cards.WheatField, cards.Ranch, cards.Bakery, cards.Cafe, cards.ConvenienceStore,
+             cards.Forest, cards.TVStation, cards.BusinessCenter, cards.Stadium,
+             cards.CheeseFactory, cards.FurnitureFactory, cards.Mine, cards.FamilyRestaurant,
+             cards.AppleOrchard, cards.FruitAndVegetableMarket]
+STARTING_ESTABLISHMENTS = {
     cards.WheatField: 6,
     cards.Ranch: 6,
     cards.Bakery: 6,
@@ -43,20 +44,24 @@ class Game:
         self.active_player = player1
         self.inactive_player = player2
         self.winner = None
-        self.cards = Counter(STARTING_INVENTORY)
+        self.establishments = Counter(STARTING_ESTABLISHMENTS)
+        self.landmarks = {player1: list(LANDMARKS), player2: list(LANDMARKS)}
 
-    def find_available_cards(self):
-        return set(self.cards.elements())
+    def find_available_cards(self, player):
+        return set(self.establishments.elements()) & self.landmarks[player]
 
-    def purchase_card(self, card, player):
+    def purchase_card(self, card_class, player):
         """A factory method that creates cards and lowers the inventory count."""
-        if card not in self.find_available_cards():
+        if card_class not in self.find_available_cards(player):
             raise RuntimeError("Tried to buy a card that isn't available!")
 
-        instance = card(player, self)
-        if player.can_buy(instance):
-            self.cards[card] -= 1
-            return instance
+        instance = card_class(player, self)
+        if player.has_funds_for(instance):
+            if instance.is_landmark():
+                self.landmarks[player].remove(card_class)
+            else:
+                self.establishments[card_class] -= 1
+            player.receive_card(instance)
 
     def switch_player(self):
         self.active_player, self.inactive_player = self.active_player, self.inactive_player
@@ -69,8 +74,10 @@ class Game:
         self.active_player.earn(roll_number)
         self.inactive_player.earn(roll_number)
 
-        available_cards = self.find_available_cards()
-        self.active_player.construct(available_cards)
+        available_cards = self.find_available_cards(self.active_player)
+        card_class = self.active_player.construct(available_cards)
+        if card_class:
+            self.purchase_card(card_class, self.active_player)
 
         if self.active_player.has_won():
             self.winner = self.active_player
@@ -94,10 +101,17 @@ class Player:
         self.balance = STARTING_BALANCE
 
     def has_won(self):
-        return len([card.is_winning() for card in self.hand]) == len(LANDMARKS)
+        return len([card for card in self.hand if card.is_landmark()]) == len(LANDMARKS)
 
-    def can_buy(self, card):
+    def has_card(self, card_class):
+        return any(card.__class__ == card_class for card in self.hand)
+
+    def has_funds_for(self, card):
         return card.cost <= self.balance
+
+    def recieve_card(self, card):
+        self.hand.append(card)
+        self.balance -= card.cost
 
     def roll(self):
         number = roll()
