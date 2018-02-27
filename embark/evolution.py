@@ -133,7 +133,3 @@ def normalize(chromosome):
 def make_random_chromosome():
     chromosome = {card: random() for card in ALL_CARDS}
     return normalize(chromosome)
-
-
-if __name__ == "__main__":
-    main()

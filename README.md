@@ -18,11 +18,15 @@ virtualenv venv
 pip install -r requirements.pip
 ```
 
-3. Run tests.
+3. Execute tests.
 
 ```
 pytest
 ```
 
-4. TODO
+4. Run embark.
+
+```
+python -m embark
+```
 
