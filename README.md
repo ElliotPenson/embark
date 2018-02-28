@@ -1,6 +1,6 @@
 # EMbArK: Evolutionary MAchi Koro
 
-[![Build Status](https://travis-ci.com/ElliotPenson/embark.svg?token=cNUB1SNbV7cHrLo7vxwQ&branch=master)](https://travis-ci.com/ElliotPenson/embark)
+[![Build Status](https://travis-ci.org/ElliotPenson/embark.svg?branch=master)](https://travis-ci.org/ElliotPenson/embark)
 
 An engine for the Japanese game Machi Koro with a genetic algorithm to generate
 AI.
