@@ -8,6 +8,7 @@ from random import random, choice
 from itertools import combinations
 
 from numpy.random import normal
+from progress.bar import ChargingBar
 
 from embark.machi_koro import Game, Player, ALL_CARDS
 from embark.parameters import (NUMBER_OF_ROUNDS, GENERATION_SIZE, RECOMBINATION_PROBABILITY,
@@ -41,8 +42,9 @@ class Organism(Player):
 
 
 def main():
+    print(f"Performing evolution with {GENERATION_SIZE} organisms for {NUMBER_OF_ROUNDS} rounds.")
     generation = {Organism(make_random_chromosome()) for _ in range(GENERATION_SIZE)}
-    for _ in range(NUMBER_OF_ROUNDS):
+    for _ in ChargingBar("Iterating").iter(list(range(NUMBER_OF_ROUNDS))):
         generation = set(iterate(generation))
     return generation
 
@@ -106,7 +108,7 @@ def select_card(chromosome):
     -> probability of selection.
     """
     if sum(chromosome.values()) == 0:
-        return choice(chromosome)  # Choose an arbitrary card.
+        return choice(list(chromosome))  # Choose an arbitrary card.
 
     chromosome = normalize(chromosome)
     return select_by_probability(chromosome)
