@@ -6,6 +6,7 @@ evolution.py
 
 from random import random, choice
 from itertools import combinations
+import csv
 
 from numpy.random import normal
 from progress.bar import ChargingBar
@@ -41,12 +42,12 @@ class Organism(Player):
         return self.chromosome.keys()
 
 
-def main():
+def run():
     print(f"Performing evolution with {GENERATION_SIZE} organisms for {NUMBER_OF_ROUNDS} rounds.")
     generation = {Organism(make_random_chromosome()) for _ in range(GENERATION_SIZE)}
     for _ in ChargingBar("Iterating").iter(list(range(NUMBER_OF_ROUNDS))):
         generation = set(iterate(generation))
-    return generation
+    return max(generation, key=lambda organism: organism.wins)
 
 
 def iterate(generation):
@@ -135,3 +136,15 @@ def normalize(chromosome):
 def make_random_chromosome():
     chromosome = {card: random() for card in ALL_CARDS}
     return normalize(chromosome)
+
+
+def print_organism(self, bar_width=100):
+    """Print the genes of an organism as a horizontal bar chart."""
+    solid_block = u"\u2588"
+
+    longest_length = max(len(card.__name__) for card in self.chromosome)
+    def pad(card_name):
+        return card_name + " " * (longest_length - len(card_name))
+
+    for card, probability in self.chromosome.items():
+        print(f"{pad(card.__name__)} {solid_block * int(probability * bar_width)}")
