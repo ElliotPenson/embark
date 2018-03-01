@@ -5,30 +5,21 @@
 An engine for the Japanese game Machi Koro with a genetic algorithm to generate
 AI.
 
+## What is Machi Koro?
+
+![Machi Koro Logo](http://idwgames.com/wp-content/uploads/2014/09/machi-koro.jpg)
+
+Machi Koro is a fun, card-based board game. Each turn, the current player rolls
+the dice, earns coins, and purchases one card. The first player to build all
+four landmark cards wins the game.
+
 ## Execution
 
-1. Create a virtual environment and activate it.
-
 ```
-virtualenv venv
-. venv/bin/activate
-```
-
-2. Install requirements.
-
-```
-pip install -r requirements.pip
+virtualenv venv                  # Create a virtual environment.
+. venv/bin/activate              # Activate the virtual environment.
+pip install -r requirements.pip  # Install dependencies.
+python -m embark                 # Run embark.
 ```
 
-3. Execute tests.
-
-```
-pytest
-```
-
-4. Run embark.
-
-```
-python -m embark
-```
-
+Algorithm parameters may be adjusted in `embark/parameters.py`.
