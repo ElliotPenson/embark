@@ -8,7 +8,7 @@ from random import random, choice
 from itertools import combinations
 import csv
 
-from numpy.random import normal
+import numpy
 from progress.bar import ChargingBar
 
 from embark.machi_koro import Game, Player, ALL_CARDS
@@ -60,9 +60,7 @@ def iterate(generation):
     total_fitness = sum(organism.wins for organism in generation)
     weights = {organism: organism.wins / total_fitness for organism in generation}
     for _ in range(GENERATION_SIZE):
-        # TODO make sure there's no asexual reproduction
-        parent1 = select_by_probability(weights)
-        parent2 = select_by_probability(weights)
+        parent1, parent2 = sample_by_probability(weights, 2)
         child = breed(parent1, parent2)
         if random() < MUTATION_PROBABILITY:
             mutate(child)
@@ -82,7 +80,7 @@ def mutate(organism):
     for card in genes:
         if random() < 1 / len(genes):
             # Mutate one gene on average.
-            organism[card] += normal(0, MUTATION_GAUSSIAN_WIDTH)
+            organism[card] += numpy.random.normal(0, MUTATION_GAUSSIAN_WIDTH)
 
             # Ensure 0 <= probability <= 1.
             if organism[card] > 1:
@@ -112,19 +110,16 @@ def select_card(chromosome):
         return choice(list(chromosome))  # Choose an arbitrary card.
 
     chromosome = normalize(chromosome)
-    return select_by_probability(chromosome)
+    return sample_by_probability(chromosome)
 
 
-def select_by_probability(probability_dict):
-    """Randomly choose a key from a dict by weight of its value. The sum of dict values should
+def sample_by_probability(probability_dict, n_samples=None):
+    """Randomly choose a key from a dict by the weight of its value. The sum of dict values should
     equal one.
     """
-    running_total = 0
-    sample = random()
-    for item in probability_dict:
-        running_total += probability_dict[item]
-        if running_total >= sample:
-            return item
+    return numpy.random.choice(list(probability_dict.keys()),
+                               size=n_samples,
+                               p=list(probability_dict.values()))
 
 
 def normalize(chromosome):
