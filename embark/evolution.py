@@ -148,3 +148,12 @@ def print_organism(self, bar_width=100):
 
     for card, probability in self.chromosome.items():
         print(f"{pad(card.__name__)} {solid_block * int(probability * bar_width)}")
+
+
+def export(generation, file_name="report.csv"):
+    with open(file_name, "w", newline="") as csvfile:
+        report = csv.writer(csvfile)
+        # Create heading.
+        report.writerow(["Wins"] + [card.__name__ for card in ALL_CARDS])
+        for organism in generation:
+            report.writerow([organism.wins] + [organism[card] for card in ALL_CARDS])
