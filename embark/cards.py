@@ -52,21 +52,30 @@ class Card:
             self.activate()
 
     def activate(self):
-        """Adjust player's balances according to the roles of this card."""
+        """Adjust player's balances according to the rules of this card."""
         if self.color in [CardColor.BLUE, CardColor.GREEN]:
             # Funds come from the bank.
-            self.owner.balance += self.reward
+            self.owner.balance += self.get_reward()
         else:
             # Funds come from the other player
             opponent = self.get_opponent()
-            available_reward = min(opponent.balance, self.reward)
+            available_reward = min(opponent.balance, self.get_reward())
             self.owner.balance += available_reward
             opponent.balance -= available_reward
+
+    def get_reward(self):
+        if (any(card.gives_cafe_bonus() for card in self.owner.hand) and
+            self.symbol in [CardSymbol.COFFEE, CardSymbol.BREAD]):
+            return self.reward + 1
+        return self.reward
 
     def is_landmark(self):
         return False
 
     def enables_double_roll(self):
+        return False
+
+    def gives_cafe_bonus(self):
         return False
 
     def get_opponent(self):
@@ -163,6 +172,9 @@ class ShoppingMall(Landmark):
 
     def __init__(self, player, game):
         super().__init__(player, game, 10)
+
+    def gives_cafe_bonus(self):
+        return True
 
 
 class AmusementPark(Landmark):
