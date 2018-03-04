@@ -120,6 +120,12 @@ class Player:
         for card in self.hand:
             card.notify(roll_number)
 
+    def choose_favorite_card(self, cards):
+        raise NotImplementedError()
+
+    def choose_least_favorite_card(self, cards):
+        raise NotImplementedError()
+
     def construct(self, available):
         """Abstract method. Return a card class from the given list."""
         raise NotImplementedError()

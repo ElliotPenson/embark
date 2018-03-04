@@ -24,6 +24,12 @@ class Organism(Player):
         """
         self.chromosome = chromosome
         self.wins = 0
+
+    def choose_favorite_card(self, cards):
+        return max(cards, key=lambda card: self[card.__class__])
+
+    def choose_least_favorite_card(self, cards):
+        return min(cards, key=lambda card: self[card.__class__])
         
     def construct(self, available):
         """Sample from this player's genes to select and purchase a card."""

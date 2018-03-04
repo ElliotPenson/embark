@@ -39,3 +39,20 @@ def test_notify():
     card.notify(card.activation[0])
     final_balance = game.active_player.balance
     assert final_balance > initial_balance
+
+
+class MockPlayer(Player):
+
+    def choose_favorite_card(self, cards):
+        return next(card for card in cards if card.__class__ is WheatField)
+
+    def choose_least_favorite_card(self, cards):
+        return next(card for card in cards if card.__class__ is Bakery)
+
+
+def test_trading():
+    game = Game(MockPlayer(), MockPlayer())
+    card = BusinessCenter(game.active_player, game)
+    card.notify(card.activation[0])
+    assert all(card.__class__ is WheatField for card in game.active_player.hand)
+    assert all(card.__class__ is Bakery for card in game.inactive_player.hand)

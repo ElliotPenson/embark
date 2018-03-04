@@ -16,8 +16,8 @@ class CardColor(Enum):
 
     def can_play(self, is_my_turn):
         if is_my_turn:
-            return self in [CardColor.BLUE, CardColor.RED]
-        return self in [CardColor.GREEN, CardColor.PURPLE]
+            return self in [CardColor.BLUE, CardColor.GREEN, CardColor.PURPLE]
+        return self in [CardColor.BLUE, CardColor.RED]
 
 
 class CardSymbol(Enum):
@@ -74,6 +74,12 @@ class Card:
             return self.game.inactive_player
         return self.game.active_player
 
+    def switch_owner(self):
+        opponent = self.get_opponent()
+        self.owner.hand.remove(self)
+        opponent.hand.append(self)
+        self.owner = opponent
+
     def clone(self, purchaser):
         return Card(self.color,
                     self.symbol,
@@ -113,9 +119,18 @@ class TraderCard(Card):
         super().__init__(color, symbol, owner, game, activation, cost, None)
 
     def activate(self):
-        # choose least favorite card from inventory
-        # choose favorite card from opponent's inventory
-        pass
+        def find_tradables(player):
+            return {card for card in player.hand if card.symbol is not self.symbol}
+
+        my_tradables = find_tradables(self.owner)
+        their_tradables = find_tradables(self.get_opponent())
+
+        card_to_give = self.owner.choose_least_favorite_card(my_tradables)
+        card_to_get = self.owner.choose_favorite_card(their_tradables)
+
+        if card_to_give and card_to_get:
+            card_to_give.switch_owner()
+            card_to_get.switch_owner()
 
     def purchase(self, purchaser):
         return TraderCard(self.color,

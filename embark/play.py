@@ -18,16 +18,11 @@ class Human(Player):
         """Display player statistics and prompt for a card."""
         self.display_hand()
         self.display_balance()
-        card_name_to_class = {card.__name__: card for card in available
-                              if card(self, self.game).cost <= self.balance}
-        questions = [
-            inquirer.List("card",
-                          message="Which card would you like to buy?",
-                          choices=list(card_name_to_class) + ["None!"])
-        ]
-        choice = inquirer.prompt(questions)["card"]
-        if not choice == "None!":
-            return card_name_to_class[choice]
+        below_balance = {card for card in available
+                         if card(self, self.game).cost <= self.balance}
+        return prompt(below_balance,
+                      "Which card would you like to buy?",
+                      lambda card: card.__name__)
 
     def display_hand(self):
         """Print a table of card types and the number owned by the player."""
@@ -41,6 +36,14 @@ class Human(Player):
     def display_balance(self):
         print(f"You have {self.balance} coin{'' if self.balance == 1 else 's'}.")
 
+    def choose_favorite_card(self, cards):
+        return prompt(cards, "Which card is your favorite?", lambda card: card.__class__.__name__)
+
+    def choose_least_favorite_card(self, cards):
+        return prompt(cards,
+                      "Which card is your least favorite?",
+                      lambda card: card.__class__.__name__)
+
 
 def human_vs_computer(organism):
     game = Game(organism, Human())
@@ -50,3 +53,18 @@ def human_vs_computer(organism):
     else:
         print("You won!")
 
+
+def prompt(items, message, key=None):
+    """Ask the user to select an item from a list."""
+    if not key:
+        key = lambda x: x
+
+    key_to_item = {key(item): item for item in items}
+    questions = [
+        inquirer.List("choice",
+                      message=message,
+                      choices=list(key_to_item.keys()) + [None])
+    ]
+    choice = inquirer.prompt(questions)["choice"]
+    if choice:
+        return key_to_item[choice]
