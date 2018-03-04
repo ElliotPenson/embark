@@ -67,8 +67,7 @@ class Game:
 
     def simulate_round(self):
         """Perform roll, earn, and construct stages of a round."""
-        self.switch_player()
-        roll_number = self.active_player.roll()
+        roll_number, was_double = self.active_player.roll()
 
         self.active_player.earn(roll_number)
         self.inactive_player.earn(roll_number)
@@ -80,6 +79,10 @@ class Game:
 
         if self.active_player.has_won():
             self.winner = self.active_player
+
+        if not (was_double and any(card.gives_extra_turn_on_doubles()
+                                   for card in self.active_player.hand)):
+            self.switch_player()
 
     def simulate(self):
         while not self.winner:
@@ -110,10 +113,12 @@ class Player:
         self.balance -= card.cost
 
     def roll(self):
-        number = roll()
+        """Throw the dice. Return a (number, was_double) tuple."""
+        first_roll = roll()
         if any(card.enables_double_roll() for card in self.hand):
-            number += roll()
-        return number
+            second_roll = roll()
+            return first_roll + second_roll, first_roll == second_roll
+        return first_roll, False
 
     def earn(self, roll_number):
         """Tell all card observers about a roll and earn money accordingly."""

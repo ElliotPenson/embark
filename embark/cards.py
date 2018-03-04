@@ -75,6 +75,9 @@ class Card:
     def enables_double_roll(self):
         return False
 
+    def gives_extra_turn_on_doubles(self):
+        return False
+
     def gives_cafe_bonus(self):
         return False
 
@@ -181,6 +184,9 @@ class AmusementPark(Landmark):
 
     def __init__(self, player, game):
         super().__init__(player, game, 16)
+
+    def gives_extra_turn_on_doubles(self):
+        return True
 
 
 class RadioTower(Landmark):
