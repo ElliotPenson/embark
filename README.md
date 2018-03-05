@@ -53,7 +53,7 @@ the more likely its selection. Each organism's fitness is defined as the number
 of wins against all other individuals in the generation. Selection probability
 is equal to the fitness of an individual divided by the sum of all fitnesses.
 
-![Fitness-Proportionate Selection](./images/fitness-proportionate-selection.png)
+<img src="./images/fitness-proportionate-selection.png" alt="Fitness-Proportionate Selection" width="200px">
 
 ### Reproduction
 
@@ -68,7 +68,7 @@ fixed probability (called the *recombination probability*).
 mutation*. This operation adds a value taken from a Gaussian random variable to
 the chosen gene.
 
-![Gaussian Mutation](./images/gaussian-mutation.png)
+<img src="./images/gaussian-mutation.png" alt="Gaussian Mutation" width="250px">
 
 The probability that a *gene* is mutated is 1/l where l is equal to the number
 of genes. The likelihood that an *organism* is mutated is called the *mutation
